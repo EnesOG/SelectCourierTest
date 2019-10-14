@@ -1,16 +1,15 @@
 const electron = require('electron');
-const {app, Menu, Tray, remote} = electron;
+const {app, Menu, Tray, shell} = electron;
 const BrowserWindow = electron.BrowserWindow;
 const path = require('path');
 const url = require('url');
-const PDFWindow = require('electron-pdf-window');
 const ipc = electron.ipcMain;
 const dialog = electron.dialog;
-const PDF2Pic = require("pdf2pic");
 const {getPrinters} = require('./printFunction');
 const {setPrinter,startServer} = require('./server');
 
 let mainWindow;
+let tray = null
 function createWindow() {
     // React
     // mainWindow = new BrowserWindow({
@@ -52,8 +51,43 @@ function createWindow() {
             }
         })
     });
-    let tray = new Tray('./tray.png');
-    const contextMenu = Menu.buildFromTemplate(printerItems);
+    tray = new Tray('./tray.png');
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: "Choose default printers",
+            enabled : false
+        },
+        {
+          type: 'separator'
+        },
+        ...printerItems,
+        {
+            type: 'separator'
+        },
+        {
+            label: 'Go to website',
+            click() {
+                let link = 'https://www.selectcourier.com/pro/index';
+                shell.openExternal(link);
+            }
+        },
+        {
+            label: 'Help',
+            click() {
+                let link = 'https://www.selectcourier.com/page/contact';
+                shell.openExternal(link);
+            }
+        },
+        {
+            label: 'Close',
+            click() {
+                mainWindow.isQuiting = true;
+                mainWindow.close();
+            }
+        }
+
+    ]);
+
     tray.setToolTip('Select Courier App');
     tray.setContextMenu(contextMenu);
     startServer();
@@ -92,6 +126,10 @@ app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
         app.quit()
     }
+});
+
+app.on('before-quit', function (evt) {
+    tray = null;
 });
 
 app.on('activate', function () {

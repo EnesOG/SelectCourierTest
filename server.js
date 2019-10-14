@@ -10,7 +10,6 @@ const startServer =  (port) => {
     const app = express();
     const {ipcRenderer} = require('electron');
     const server = require('http').Server(app);
-    const io = require('socket.io')(server);
     const formidable = require('formidable');
     const compression = require('compression');
     const bodyParser = require('body-parser');
@@ -24,7 +23,6 @@ const startServer =  (port) => {
     app.get('/', (req, res) => res.send('Server works :D'));
     let defaultPort = 5000;
     if (port) defaultPort = port;
-    require('./socket')(io);
     app.post('/sendFile', (req, res) => {
         let fileName;
         const setFileName = (file) => {
