@@ -157,10 +157,7 @@ if (!gotTheLock) {
 
     function sendStatusToWindow(text) {
         log.info(text);
-        dialog.showMessageBox(mainWindow, {
-            type: "info",
-            message: text
-        })
+        dialog.showErrorBox("Test", text)
     }
 
 
