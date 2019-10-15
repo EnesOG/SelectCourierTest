@@ -29,7 +29,7 @@ if (!gotTheLock) {
     });
 
     function createWindow() {
-        const server = "https://hazel.sagirenes.now.sh"
+        const server = "https://hazel.sagirenes.now.sh";
         const feed = `${server}/update/${process.platform}/${app.getVersion()}`;
         autoUpdater.setFeedURL({
             url: feed
@@ -100,7 +100,7 @@ if (!gotTheLock) {
                 }
             },
             {
-                label: 'Help2',
+                label: 'Help',
                 click() {
                     let link = 'https://www.selectcourier.com/page/contact';
                     shell.openExternal(link);
