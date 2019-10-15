@@ -1,6 +1,10 @@
 {
   "name": "app",
   "description": "The official Select Courier App",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EnesOG/SelectCourierTest.git"
+  },
   "author": {
     "email": "info@selectcourier.com",
     "name": "Enes Sagir",

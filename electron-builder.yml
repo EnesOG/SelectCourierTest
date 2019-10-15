@@ -1,0 +1,4 @@
+appId: com.SelectCourierApp.ElectronAutoUpdate
+publish:
+  provider: github
+  token: 66c9a30beb7575b86cf29cfe6b762ed23849fb1f
