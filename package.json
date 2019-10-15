@@ -1,18 +1,28 @@
 {
-  "name": "selectcourierprinterapp",
+  "name": "app",
+  "description": "The official Select Courier App",
+  "author": {
+    "email": "info@selectcourier.com",
+    "name": "Enes Sagir",
+    "url": "https://www.selectcourier.com/"
+  },
   "version": "0.1.0",
+  "main": "main.js",
   "private": true,
   "dependencies": {
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
+    "electron-log": "^3.0.8",
+    "electron-updater": "^4.1.2",
     "express": "^4.17.1",
     "formidable": "^1.2.1",
     "http": "0.0.0",
     "node-pdf-printer": "^1.1.4"
   },
   "scripts": {
-    "electron": "electron main.js"
+    "electron": "electron main.js",
+    "build": "electron-builder"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -30,6 +40,28 @@
     ]
   },
   "devDependencies": {
-    "electron": "^6.0.11"
+    "electron": "^6.0.11",
+    "electron-packager": "^14.0.6",
+    "electron-builder": "^21.2.0"
+  },
+  "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "EnesOG",
+        "repo": "SelectCourierTest"
+      }
+    ],
+    "electronVersion": "6.0.11",
+    "appId": "com.selectcourier.app",
+    "productName": "Select Courier App",
+    "target": "NSIS",
+    "directories": {
+      "output": "build"
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false
+    }
   }
 }

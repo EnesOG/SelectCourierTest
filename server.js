@@ -22,6 +22,7 @@ const startServer =  (port) => {
     app.use(cors());
     app.get('/', (req, res) => res.send('Server works :D'));
     let defaultPort = 5000;
+    let fallbackPort = 5001;
     if (port) defaultPort = port;
     app.post('/sendFile', (req, res) => {
         let fileName;
@@ -40,6 +41,12 @@ const startServer =  (port) => {
     });
     server.listen(defaultPort, () => {
         console.log(`server is running on port:${defaultPort}`)
+    });
+
+    server.on('error', function (e) {
+        server.listen(fallbackPort, () => {
+            console.log(`server is running on port:${fallbackPort}`);
+        });
     });
 };
 
