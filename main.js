@@ -181,6 +181,7 @@ if (!gotTheLock) {
     });
     autoUpdater.on('update-downloaded', (info) => {
         sendStatusToWindow('Update downloaded');
+        autoUpdater.quitAndInstall();
     });
 
     app.on('before-quit', function (evt) {
