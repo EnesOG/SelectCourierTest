@@ -56,6 +56,9 @@
         "repo": "SelectCourierTest"
       }
     ],
+    "win": {
+      "publish":[{"provider": "generic", "url": "localhost/"}]
+    },
     "electronVersion": "6.0.11",
     "appId": "com.selectcourier.app",
     "productName": "Select Courier App",

@@ -1,18 +1,15 @@
 const electron = require('electron');
-const {app, Menu, Tray, shell, dialog} = electron;
+const {app, Menu, Tray, shell, dialog, autoUpdater} = electron;
 const BrowserWindow = electron.BrowserWindow;
 const gotTheLock = app.requestSingleInstanceLock();
 const path = require('path');
 const url = require('url');
 const ipc = electron.ipcMain;
-const {autoUpdater} = require('electron-updater');
 const log = require('electron-log');
 const {getPrinters} = require('./printFunction');
 const {setPrinter, startServer} = require('./server');
 
 
-autoUpdater.logger = log;
-autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
 let mainWindow;
@@ -32,7 +29,12 @@ if (!gotTheLock) {
     });
 
     function createWindow() {
-        autoUpdater.checkForUpdatesAndNotify();
+        const server = "https://hazel.sagirenes.now.sh"
+        const feed = `${server}/update/${process.platform}/${app.getVersion()}`;
+        autoUpdater.setFeedURL({
+            url: feed
+        });
+
         // React
         // mainWindow = new BrowserWindow({
         //     show: false,
@@ -147,41 +149,11 @@ if (!gotTheLock) {
     ipc.on('lol', (event, data) => console.log(data));
 
 
-
     app.on('ready', createWindow);
     app.on('window-all-closed', function () {
         if (process.platform !== 'darwin') {
             app.quit()
         }
-    });
-
-    function sendStatusToWindow(text) {
-        log.info(text);
-        dialog.showErrorBox("Test", text)
-    }
-
-
-    autoUpdater.on('checking-for-update', () => {
-        sendStatusToWindow('Checking for update...');
-    });
-    autoUpdater.on('update-available', (info) => {
-        sendStatusToWindow('Update available.');
-    });
-    autoUpdater.on('update-not-available', (info) => {
-        sendStatusToWindow('Update not available.');
-    });
-    autoUpdater.on('error', (err) => {
-        sendStatusToWindow('Error in auto-updater. ' + err);
-    });
-    autoUpdater.on('download-progress', (progressObj) => {
-        let log_message = "Download speed: " + progressObj.bytesPerSecond;
-        log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-        log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-        sendStatusToWindow(log_message);
-    });
-    autoUpdater.on('update-downloaded', (info) => {
-        sendStatusToWindow('Update downloaded');
-        autoUpdater.quitAndInstall();
     });
 
     app.on('before-quit', function (evt) {
