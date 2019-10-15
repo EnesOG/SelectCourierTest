@@ -98,7 +98,7 @@ if (!gotTheLock) {
                 }
             },
             {
-                label: 'Help',
+                label: 'Help2',
                 click() {
                     let link = 'https://www.selectcourier.com/page/contact';
                     shell.openExternal(link);
