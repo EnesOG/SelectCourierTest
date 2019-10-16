@@ -145,7 +145,7 @@ if (!gotTheLock) {
     });
 
     autoUpdater.on('error', (ev, err) => {
-        sendStatus('Error in auto-updater.');
+        sendStatus('Error in' + err);
         log.info('err', err);
         log.info('arguments', arguments);
     });

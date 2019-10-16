@@ -26,7 +26,7 @@
   },
   "scripts": {
     "electron": "electron main.js",
-    "build": "electron-builder"
+    "build": "electron-builder build --win --publish always"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -57,7 +57,12 @@
       }
     ],
     "win": {
-      "publish":[{"provider": "generic", "url": "localhost/"}]
+      "publish": [
+        {
+          "provider": "generic",
+          "url": "https://hazel.sagirenes.now.sh"
+        }
+      ]
     },
     "electronVersion": "6.0.11",
     "appId": "com.selectcourier.app",
