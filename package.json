@@ -57,6 +57,8 @@
       }
     ],
     "win": {
+      "certificateFile": "./electron-example.pfx",
+      "certificatePassword": "enes123456",
       "publish": [
         {
           "provider": "generic",
