@@ -10,10 +10,21 @@ const {getPrinters} = require('./printFunction');
 const {setPrinter, startServer} = require('./server');
 
 
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
 
 let mainWindow;
 let tray = null;
+
+function sendStatus(text) {
+    log.info(text);
+    if (mainWindow) {
+
+    }
+}
+
+
 const trayPath = path.join(__dirname, 'images/tray.png');
 if (!gotTheLock) {
     dialog.showErrorBox('Oops! Something went wrong!', 'The Select Courier Application is already running!');
@@ -164,5 +175,32 @@ if (!gotTheLock) {
         if (mainWindow === null) {
             createWindow()
         }
+    });
+
+    autoUpdater.on('checking-for-update', () => {
+        sendStatus('Checking for update...');
+    });
+    autoUpdater.on('update-available', (ev, info) => {
+        sendStatus('Update available.');
+        log.info('info', info);
+        log.info('arguments', arguments);
+    });
+    autoUpdater.on('update-not-available', (ev, info) => {
+        sendStatus('Update not available.');
+        log.info('info', info);
+        log.info('arguments', arguments);
+    });
+    autoUpdater.on('error', (ev, err) => {
+        sendStatus('Error in auto-updater.');
+        log.info('err', err);
+        log.info('arguments', arguments);
+    });
+    autoUpdater.on('update-downloaded', (ev, info) => {
+        sendStatus('Update downloaded.  Will quit and install in 5 seconds.');
+        log.info('info', info);
+        log.info('arguments', arguments);
+        setTimeout(function() {
+          autoUpdater.quitAndInstall();
+        }, 5000)
     });
 }
