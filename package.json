@@ -49,20 +49,15 @@
     "electron-builder": "^21.2.0"
   },
   "build": {
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "EnesOG",
-        "repo": "SelectCourierTest"
-      }
-    ],
     "win": {
       "certificateFile": "./electron-example.pfx",
       "certificatePassword": "enes123456",
       "publish": [
         {
-          "provider": "generic",
-          "url": "https://hazel.sagirenes.now.sh"
+          "provider": "github",
+          "owner": "EnesOG",
+          "repo": "SelectCourierTest",
+          "token": "98ab9774903b9926f07b784fd7db30b034855cb2"
         }
       ]
     },
