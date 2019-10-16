@@ -1,5 +1,6 @@
 const electron = require('electron');
-const {app, Menu, Tray, shell, dialog, autoUpdater} = electron;
+const { autoUpdater } = require('electron-updater');
+const {app, Menu, Tray, shell, dialog} = electron;
 const BrowserWindow = electron.BrowserWindow;
 const gotTheLock = app.requestSingleInstanceLock();
 const path = require('path');
@@ -40,32 +41,8 @@ if (!gotTheLock) {
     function createWindow() {
         const server = "https://hazel.sagirenes.now.sh";
         const feed = `${server}/update/${process.platform}/${app.getVersion()}`;
-        autoUpdater.setFeedURL({
-            url: feed
-        });
-
-        // React
-        // mainWindow = new BrowserWindow({
-        //     show: false,
-        //     width: 800, height: 600,
-        //     icon: './tray.png',
-        //     title: 'Select Courier',
-        //     webPreferences: {
-        //         plugins: true,
-        //         nodeIntegration: false,
-        //         preload: __dirname + '/preload.js'
-        //     }
-        // });
-        // mainWindow.loadURL('http://localhost:3000/');
-        // mainWindow.webContents.openDevTools();
-        // mainWindow.on('minimize',function(event){
-        //     event.preventDefault();
-        //     mainWindow.hide();
-        // });
-        //
-        // mainWindow.on('closed', function () {
-        //     mainWindow = null
-        // });
+        autoUpdater.setFeedURL(feed);
+        autoUpdater.checkForUpdatesAndNotify();
         let mainWindow = new BrowserWindow({
             'auto-hide-menu-bar': true,
             show: false,
@@ -130,30 +107,6 @@ if (!gotTheLock) {
         startServer();
     }
 
-// For React
-// ipc.on('getPrinters', (event, args) => {
-//     console.log('ipc getPrinters got triggered');
-//     const printers = mainWindow.webContents.getPrinters();
-//     console.log(printers.length);
-//     mainWindow.send('sendPrinters', printers)
-// });
-//
-// ipc.on('print', (event, args) => {
-//     const win = new BrowserWindow({show: false, width: 800, height: 600,});
-//     PDFWindow.addSupport(win);
-//     win.loadURL(__dirname + './sample.pdf');
-//     mainWindow.webContents.on('did-finish-load', () => {
-//         setTimeout(() => {
-//             win.webContents.print({silent: true});
-//             // win.webContents.print({silent: true});
-//         }, 2500) // A time to load and render PDF
-//     });
-// });
-//
-// ipc.on('serverStart',(event,{port}) => {
-//     startServer(port);
-// });
-//
     ipc.on('test', (event, {name, fileName}) => getPrinters(name, fileName));
     ipc.on('lol', (event, data) => console.log(data));
 
