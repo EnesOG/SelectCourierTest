@@ -1,6 +1,6 @@
 const electron = require('electron');
-const { autoUpdater } = require('electron-updater');
 const {app, Menu, Tray, shell, dialog} = electron;
+const {autoUpdater} = require('electron-updater');
 const BrowserWindow = electron.BrowserWindow;
 const gotTheLock = app.requestSingleInstanceLock();
 const path = require('path');
@@ -9,24 +9,26 @@ const ipc = electron.ipcMain;
 const log = require('electron-log');
 const {getPrinters} = require('./printFunction');
 const {setPrinter, startServer} = require('./server');
+const AutoLaunch = require('auto-launch');
+
+let autoLaunch = new AutoLaunch({
+    name: 'Select Courier App',
+    path: app.getPath('exe'),
+});
+autoLaunch.isEnabled().then((isEnabled) => {
+    if (!isEnabled) autoLaunch.enable();
+});
 
 
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
 log.info('App starting...');
-
+let isUpdate = false;
 let mainWindow;
+let hideDialog = false;
 let tray = null;
-
-function sendStatus(text) {
-    log.info(text);
-        dialog.showErrorBox('test', text)
-}
-
-
 const trayPath = path.join(__dirname, 'images/tray.png');
 if (!gotTheLock) {
-    dialog.showErrorBox('Oops! Something went wrong!', 'The Select Courier Application is already running!');
     app.quit();
 } else {
 
@@ -39,9 +41,6 @@ if (!gotTheLock) {
     });
 
     function createWindow() {
-        const server = "https://hazel.sagirenes.now.sh";
-        const feed = `${server}/update/${process.platform}/${app.getVersion()}`;
-        autoUpdater.setFeedURL(feed);
         autoUpdater.checkForUpdatesAndNotify();
         let mainWindow = new BrowserWindow({
             'auto-hide-menu-bar': true,
@@ -66,7 +65,7 @@ if (!gotTheLock) {
             })
         });
         tray = new Tray(trayPath);
-        const contextMenu = Menu.buildFromTemplate([
+        let contextMenu = [
             {
                 label: "Choose default printers",
                 enabled: false
@@ -100,11 +99,66 @@ if (!gotTheLock) {
                 }
             }
 
-        ]);
+        ];
+        const menuTem = Menu.buildFromTemplate(contextMenu);
 
         tray.setToolTip('Select Courier App');
-        tray.setContextMenu(contextMenu);
+        tray.setContextMenu(menuTem);
         startServer();
+        autoUpdater.on('checking-for-update', () => {
+            log.info('info', 'update checking')
+        });
+
+        autoUpdater.on('update-available', (ev, info) => {
+            log.info('info', info);
+            log.info('arguments', arguments);
+        });
+
+        autoUpdater.on('update-not-available', (ev, info) => {
+            log.info('info', info);
+            log.info('arguments', arguments);
+        });
+
+        autoUpdater.on('error', (ev, err) => {
+            dialog.showErrorBox('error', err);
+            log.info('err', err);
+            log.info('arguments', arguments);
+        });
+
+        autoUpdater.on('update-downloaded', (ev, info) => {
+            log.info('info', info);
+            log.info('arguments', arguments);
+
+            const option = {
+                type: 'question',
+                buttons: ['Yes, please', 'No Thanks'],
+                defaultId: 1,
+                title: 'There is a new version.',
+                message: 'Do you want to update now?',
+            };
+
+            if (hideDialog === false) {
+                dialog.showMessageBox(null, option, (res => {
+                    if (res === 0) {
+                        autoUpdater.quitAndInstall();
+                    } else {
+                        hideDialog = true;
+                        contextMenu.splice(
+                            contextMenu.length - 1,0,
+                            {
+                                label: 'Update now',
+                                click() {
+                                    autoUpdater.quitAndInstall();
+                                }
+                            }
+                        );
+                        console.log(contextMenu);
+                        const menuTem = Menu.buildFromTemplate(contextMenu);
+                        tray.setContextMenu(menuTem);
+                    }
+                }));
+            }
+        });
     }
 
     ipc.on('test', (event, {name, fileName}) => getPrinters(name, fileName));
@@ -128,34 +182,5 @@ if (!gotTheLock) {
         }
     });
 
-    autoUpdater.on('checking-for-update', () => {
-        sendStatus('Checking for update...');
-    });
-
-    autoUpdater.on('update-available', (ev, info) => {
-        sendStatus('Update available.');
-        log.info('info', info);
-        log.info('arguments', arguments);
-    });
-
-    autoUpdater.on('update-not-available', (ev, info) => {
-        sendStatus('Update not available.');
-        log.info('info', info);
-        log.info('arguments', arguments);
-    });
-
-    autoUpdater.on('error', (ev, err) => {
-        sendStatus('Error in' + err);
-        log.info('err', err);
-        log.info('arguments', arguments);
-    });
-
-    autoUpdater.on('update-downloaded', (ev, info) => {
-        sendStatus('Update downloaded.  Will quit and install in 5 seconds.');
-        log.info('info', info);
-        log.info('arguments', arguments);
-        setTimeout(function () {
-            autoUpdater.quitAndInstall();
-        }, 5000)
-    });
+    if(hideDialog === false) setInterval(() => autoUpdater.checkForUpdatesAndNotify(), 60 * 1000);
 }

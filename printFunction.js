@@ -3,22 +3,22 @@ const path = require('path');
 const fs = require('fs');
 __dirname = path.resolve();
 
-const getPrinters = (printer, printerFile) =>{
-    NodePdfPrinter.printFiles([__dirname + './pdf/' + printerFile], printer);
+const getPrinters = (printer, printerFiles) => {
+    const filesPath = printerFiles.map(files => `${__dirname}./pdf/${files}`);
+    NodePdfPrinter.printFiles(filesPath, printer).then(() => deleteFile(printerFiles))
+
+};
+
+const deleteFile = (files) => files.forEach(file => {
+    const path = `./pdf/${file}`;
     setTimeout(() => {
-        deleteFile(printerFile)
-    },3000)
-};
-
-
-const deleteFile = (fileName) =>{
-    const path = `./pdf/${fileName}`;
-    try {
-        fs.unlinkSync(path);
-    } catch(err) {
-        console.log.error(err)
-    }
-};
+        try {
+            fs.unlinkSync(path);
+        } catch (err) {
+            console.log(err)
+        }
+    }, 5000);
+});
 
 module.exports = {
     getPrinters

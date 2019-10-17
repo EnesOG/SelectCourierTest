@@ -20,20 +20,25 @@ const startServer =  (port) => {
         extended: true
     }));
     app.use(cors());
-    app.get('/', (req, res) => res.send('Server works :D'));
+    app.get('/ping', (req, res) => res.sendStatus(200));
     let defaultPort = 5000;
     let fallbackPort = 5001;
     if (port) defaultPort = port;
     app.post('/sendFile', (req, res) => {
         let fileName;
+        let files = [];
         const setFileName = (file) => {
             fileName = file.split('.').join('-' + Date.now() + '.').replace(/ /g, '');
         };
         new formidable.IncomingForm().parse(req)
             .on('fileBegin', (name, file) => {
                 setFileName(file.name);
-                file.path = __dirname + '/pdf/' + fileName
-                getPrinters(printer,fileName);
+                files.push(fileName);
+                file.path = __dirname + '/pdf/' + fileName;
+               // console.log(file.path);
+            })
+            .on('end', () => {
+                getPrinters(printer,files);
             })
             // For React .on('file', function (name, file) {
             //     io.emit('filePrinter', fileName);

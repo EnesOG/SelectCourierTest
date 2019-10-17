@@ -1,20 +1,18 @@
 {
   "name": "app",
   "description": "The official Select Courier App",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/EnesOG/SelectCourierTest.git"
-  },
   "author": {
     "email": "info@selectcourier.com",
     "name": "Enes Sagir",
     "url": "https://www.selectcourier.com/"
   },
-  "version": "0.1.0",
+  "version": "0.5.9",
   "main": "main.js",
   "private": true,
   "dependencies": {
+    "auto-launch": "^5.0.5",
     "body-parser": "^1.19.0",
+    "child_process": "^1.0.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "electron-log": "^3.0.8",
@@ -22,11 +20,12 @@
     "express": "^4.17.1",
     "formidable": "^1.2.1",
     "http": "0.0.0",
+    "iconv-lite": "^0.5.0",
     "node-pdf-printer": "^1.1.4"
   },
   "scripts": {
     "electron": "electron main.js",
-    "build": "electron-builder build --win --publish always"
+    "build": "electron-builder build --win -p always"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -52,12 +51,12 @@
     "win": {
       "certificateFile": "./electron-example.pfx",
       "certificatePassword": "enes123456",
+      "verifyUpdateCodeSignature": false,
       "publish": [
         {
           "provider": "github",
           "owner": "EnesOG",
-          "repo": "SelectCourierTest",
-          "token": "98ab9774903b9926f07b784fd7db30b034855cb2"
+          "repo": "SelectCourierTest"
         }
       ]
     },
