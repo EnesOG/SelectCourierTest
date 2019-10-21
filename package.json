@@ -6,7 +6,7 @@
     "name": "Enes Sagir",
     "url": "https://www.selectcourier.com/"
   },
-  "version": "0.5.9",
+  "version": "0.7.3",
   "main": "main.js",
   "private": true,
   "dependencies": {

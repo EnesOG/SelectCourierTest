@@ -10,6 +10,8 @@ const log = require('electron-log');
 const {getPrinters} = require('./printFunction');
 const {setPrinter, startServer} = require('./server');
 const AutoLaunch = require('auto-launch');
+const fs = require('fs');
+
 
 let autoLaunch = new AutoLaunch({
     name: 'Select Courier App',
@@ -42,6 +44,8 @@ if (!gotTheLock) {
 
     function createWindow() {
         autoUpdater.checkForUpdatesAndNotify();
+        if (!fs.existsSync(`./pdf`)) fs.mkdir(`./pdf`, () => {
+        });
         let mainWindow = new BrowserWindow({
             'auto-hide-menu-bar': true,
             show: false,
@@ -49,7 +53,7 @@ if (!gotTheLock) {
             title: "Select Courier"
         });
         let printerItems = [];
-        const printers = mainWindow.webContents.getPrinters();
+        const printers = mainWindow.webContents.getPrinters().sort((a, b) => b.isDefault - a.isDefault);
         printers.forEach(printer => {
             if (printer.isDefault) {
                 setPrinter(printer.name)
@@ -133,7 +137,7 @@ if (!gotTheLock) {
                 type: 'question',
                 buttons: ['Yes, please', 'No Thanks'],
                 defaultId: 1,
-                title: 'There is a new version.',
+                title: 'Select Courier App',
                 message: 'Do you want to update now?',
             };
 
@@ -144,7 +148,7 @@ if (!gotTheLock) {
                     } else {
                         hideDialog = true;
                         contextMenu.splice(
-                            contextMenu.length - 1,0,
+                            contextMenu.length - 1, 0,
                             {
                                 label: 'Update now',
                                 click() {
@@ -182,5 +186,5 @@ if (!gotTheLock) {
         }
     });
 
-    if(hideDialog === false) setInterval(() => autoUpdater.checkForUpdatesAndNotify(), 60 * 1000);
+    if (hideDialog === false) setInterval(() => autoUpdater.checkForUpdatesAndNotify(), 60 * 1000);
 }

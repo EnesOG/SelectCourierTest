@@ -5,7 +5,7 @@ const setPrinter  = (name) => {
     printer = name;
 };
 
-const startServer =  (port) => {
+const startServer =  (port, res) => {
     const express = require('express');
     const app = express();
     const {ipcRenderer} = require('electron');
@@ -34,11 +34,14 @@ const startServer =  (port) => {
             .on('fileBegin', (name, file) => {
                 setFileName(file.name);
                 files.push(fileName);
-                file.path = __dirname + '/pdf/' + fileName;
-               // console.log(file.path);
+                file.path = './pdf/' + fileName;
             })
             .on('end', () => {
                 getPrinters(printer,files);
+                res.json({
+                    status: 'Printing'
+                })
+
             })
             // For React .on('file', function (name, file) {
             //     io.emit('filePrinter', fileName);
