@@ -1,6 +1,4 @@
-const {getPrinters} = require('./printFunction');
 let printer;
-
 const setPrinter  = (name) => {
     printer = name;
 };
@@ -11,41 +9,23 @@ const startServer =  (port, res) => {
     const {ipcRenderer} = require('electron');
     const server = require('http').Server(app);
     const formidable = require('formidable');
+    const {writeFileAsync} = require('./writeFileAsync');
     const compression = require('compression');
+    const fs = require('fs');
     const bodyParser = require('body-parser');
     const cors = require('cors');
     app.use(compression());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({
-        extended: true
-    }));
+    app.use(bodyParser.json({ limit: '1000mb' }));
+    app.use(bodyParser.urlencoded({ extended: true, limit: '1000mb' }));
     app.use(cors());
     app.get('/ping', (req, res) => res.sendStatus(200));
     let defaultPort = 5000;
     let fallbackPort = 5001;
     if (port) defaultPort = port;
     app.post('/sendFile', (req, res) => {
-        let fileName;
-        let files = [];
-        const setFileName = (file) => {
-            fileName = file.split('.').join('-' + Date.now() + '.').replace(/ /g, '');
-        };
-        new formidable.IncomingForm().parse(req)
-            .on('fileBegin', (name, file) => {
-                setFileName(file.name);
-                files.push(fileName);
-                file.path = './pdf/' + fileName;
-            })
-            .on('end', () => {
-                getPrinters(printer,files);
-                res.json({
-                    status: 'Printing'
-                })
-
-            })
-            // For React .on('file', function (name, file) {
-            //     io.emit('filePrinter', fileName);
-            // });
+        const {files} = req.body;
+        writeFileAsync(files,printer);
+        res.json({status: 'Printing'});
     });
     server.listen(defaultPort, () => {
         console.log(`server is running on port:${defaultPort}`)
