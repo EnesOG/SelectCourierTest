@@ -1,8 +1,4 @@
-
-
-const {getPrinters} = require('./printFunction');
 let printer;
-
 const setPrinter  = (name) => {
     printer = name;
 };
@@ -19,18 +15,17 @@ const startServer =  (port, res) => {
     const bodyParser = require('body-parser');
     const cors = require('cors');
     app.use(compression());
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({
-        extended: true
-    }));
+    app.use(bodyParser.json({ limit: '1000mb' }));
+    app.use(bodyParser.urlencoded({ extended: true, limit: '1000mb' }));
     app.use(cors());
     app.get('/ping', (req, res) => res.sendStatus(200));
     let defaultPort = 5000;
     let fallbackPort = 5001;
     if (port) defaultPort = port;
     app.post('/sendFile', (req, res) => {
-        const {blobs} = req.body;
-        writeFileAsync(blobs)
+        const {files} = req.body;
+        writeFileAsync(files,printer);
+        res.json({status: 'Printing'});
     });
     server.listen(defaultPort, () => {
         console.log(`server is running on port:${defaultPort}`)

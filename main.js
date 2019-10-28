@@ -2,6 +2,7 @@ const electron = require('electron');
 const {app, Menu, Tray, shell, dialog} = electron;
 const {autoUpdater} = require('electron-updater');
 const BrowserWindow = electron.BrowserWindow;
+const checkInternetConnected = require('check-internet-connected');
 const gotTheLock = app.requestSingleInstanceLock();
 const path = require('path');
 const url = require('url');
@@ -11,6 +12,20 @@ const {getPrinters} = require('./printFunction');
 const {setPrinter, startServer} = require('./server');
 const AutoLaunch = require('auto-launch');
 const fs = require('fs');
+
+const config = {
+    timeout: 6000, //timeout connecting to each server, each try
+    retries: 10,//number of retries to do before failing
+    domain: 'https://apple.com',//the domain to check DNS record of
+};
+const checkInternet = (config) => {
+    checkInternetConnected(config)
+        .then((result) => {
+            autoUpdater.checkForUpdatesAndNotify();
+        }) .catch(ex => {
+            console.log('Connection is off');
+    });
+};
 
 
 let autoLaunch = new AutoLaunch({
@@ -43,9 +58,10 @@ if (!gotTheLock) {
     });
 
     function createWindow() {
-        autoUpdater.checkForUpdatesAndNotify();
+        checkInternet();
         if (!fs.existsSync(`./pdf`)) fs.mkdir(`./pdf`, () => {
         });
+
         let mainWindow = new BrowserWindow({
             'auto-hide-menu-bar': true,
             show: false,
@@ -54,6 +70,7 @@ if (!gotTheLock) {
         });
         let printerItems = [];
         const printers = mainWindow.webContents.getPrinters().sort((a, b) => b.isDefault - a.isDefault);
+        console.log(printers);
         printers.forEach(printer => {
             if (printer.isDefault) {
                 setPrinter(printer.name)
@@ -186,5 +203,5 @@ if (!gotTheLock) {
         }
     });
 
-    if (hideDialog === false) setInterval(() => autoUpdater.checkForUpdatesAndNotify(), 60 * 1000);
+    if (hideDialog === false) setInterval(() => checkInternet(), 60 * 1000);
 }
