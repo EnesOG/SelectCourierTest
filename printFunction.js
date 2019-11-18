@@ -7,7 +7,7 @@ const getPrinters = (printer, printerFiles) => {
     const filesPath = printerFiles.map(files => `${__dirname}./pdf/${files}`);
     NodePdfPrinter.printFiles(filesPath, printer)
         .then(() => deleteFile(printerFiles))
-        .catch(() => deleteFile(printerFiles));
+
 };
 
 const deleteFile = (files) => files.forEach(file => {

@@ -12,6 +12,8 @@ const {getPrinters} = require('./printFunction');
 const {setPrinter, startServer} = require('./server');
 const AutoLaunch = require('auto-launch');
 const fs = require('fs');
+let update = false;
+
 
 const config = {
     timeout: 6000, //timeout connecting to each server, each try
@@ -32,8 +34,10 @@ let autoLaunch = new AutoLaunch({
     name: 'Select Courier App',
     path: app.getPath('exe'),
 });
+
 autoLaunch.isEnabled().then((isEnabled) => {
     if (!isEnabled) autoLaunch.enable();
+    autoLaunch.enable()
 });
 
 
@@ -58,7 +62,6 @@ if (!gotTheLock) {
     });
 
     function createWindow() {
-        checkInternet();
         if (!fs.existsSync(`./pdf`)) fs.mkdir(`./pdf`, () => {
         });
 
@@ -88,7 +91,7 @@ if (!gotTheLock) {
         tray = new Tray(trayPath);
         let contextMenu = [
             {
-                label: "Choose default printers",
+                label: "Choose default printer",
                 enabled: false
             },
             {
@@ -132,6 +135,7 @@ if (!gotTheLock) {
 
         autoUpdater.on('update-available', (ev, info) => {
             log.info('info', info);
+            update = true;
             log.info('arguments', arguments);
         });
 
@@ -141,45 +145,46 @@ if (!gotTheLock) {
         });
 
         autoUpdater.on('error', (ev, err) => {
-            dialog.showErrorBox('error', err);
+           // dialog.showErrorBox('error', err);
             log.info('err', err);
             log.info('arguments', arguments);
         });
 
-        autoUpdater.on('update-downloaded', (ev, info) => {
-            log.info('info', info);
-            log.info('arguments', arguments);
+       if(!update) {
+           autoUpdater.on('update-downloaded', (ev, info) => {
+               log.info('info', info);
+               log.info('arguments', arguments);
+               const option = {
+                   type: 'question',
+                   buttons: ['Yes, please', 'No Thanks'],
+                   defaultId: 1,
+                   title: 'Select Courier App',
+                   message: 'Do you want to update now?',
+               };
 
-            const option = {
-                type: 'question',
-                buttons: ['Yes, please', 'No Thanks'],
-                defaultId: 1,
-                title: 'Select Courier App',
-                message: 'Do you want to update now?',
-            };
-
-            if (hideDialog === false) {
-                dialog.showMessageBox(null, option, (res => {
-                    if (res === 0) {
-                        autoUpdater.quitAndInstall();
-                    } else {
-                        hideDialog = true;
-                        contextMenu.splice(
-                            contextMenu.length - 1, 0,
-                            {
-                                label: 'Update now',
-                                click() {
-                                    autoUpdater.quitAndInstall();
-                                }
-                            }
-                        );
-                        console.log(contextMenu);
-                        const menuTem = Menu.buildFromTemplate(contextMenu);
-                        tray.setContextMenu(menuTem);
-                    }
-                }));
-            }
-        });
+               if (hideDialog === false) {
+                   dialog.showMessageBox(null, option, (res => {
+                       if (res === 0) {
+                           autoUpdater.quitAndInstall();
+                       } else {
+                           hideDialog = true;
+                           contextMenu.splice(
+                               contextMenu.length - 1, 0,
+                               {
+                                   label: 'Update now',
+                                   click() {
+                                       autoUpdater.quitAndInstall();
+                                   }
+                               }
+                           );
+                           console.log(contextMenu);
+                           const menuTem = Menu.buildFromTemplate(contextMenu);
+                           tray.setContextMenu(menuTem);
+                       }
+                   }));
+               }
+           });
+       }
     }
 
     ipc.on('test', (event, {name, fileName}) => getPrinters(name, fileName));
@@ -203,5 +208,7 @@ if (!gotTheLock) {
         }
     });
 
-    if (hideDialog === false) setInterval(() => checkInternet(), 60 * 1000);
+    if (!update) {
+        setInterval(() => checkInternet(config), 60 * 1000);
+    }
 }

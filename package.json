@@ -6,9 +6,8 @@
     "name": "Select Courier B.V",
     "url": "https://www.selectcourier.com/"
   },
-  "version": "0.9.4",
+  "version": "1.1.1",
   "main": "main.js",
-  "private": true,
   "dependencies": {
     "auto-launch": "^5.0.5",
     "body-parser": "^1.19.0",
@@ -20,9 +19,11 @@
     "electron-updater": "^4.1.2",
     "express": "^4.17.1",
     "formidable": "^1.2.1",
+    "fs": "0.0.1-security",
     "http": "0.0.0",
     "iconv-lite": "^0.5.0",
-    "node-pdf-printer": "^1.1.4"
+    "node-pdf-printer": "^1.1.4",
+    "path": "^0.12.7"
   },
   "scripts": {
     "electron": "electron main.js",
@@ -52,14 +53,14 @@
   "build": {
     "win": {
       "publisherName": "Select Courier B.V",
+      "artifactName": "${productName} Setup.${ext}",
       "certificateFile": "./cert/electron.p12",
       "certificatePassword": "fh73jfjas9koa",
-      "verifyUpdateCodeSignature": true,
       "publish": [
         {
           "provider": "github",
           "owner": "EnesOG",
-          "repo": "SelectCourierTest",
+          "repo": "SelectCourierTest"
         }
       ]
     },
@@ -71,8 +72,9 @@
       "output": "build"
     },
     "nsis": {
-      "allowToChangeInstallationDirectory": true,
-      "oneClick": false
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "oneClick": true
     }
   }
 }

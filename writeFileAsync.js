@@ -9,21 +9,24 @@ const writeFile = (blobs) => {
             const date = new Date().getTime();
             let fileName = `${date}-${i}-${i * 11}`.replace(/ /g, '');
             let file = `${fileName}.pdf`;
+            console.log(file);
             files.push(file);
             fs.writeFile(`./pdf/${file}`, base, 'base64', (err) => {
-                reject(err);
+                if(err) reject(err);
+                else {
+                    resolve();
+                }
             })
         });
-        resolve();
     })
 };
 
 
 const writeFileAsync = (blobs, printer) => {
-    console.log(blobs);
+    //console.log(blobs.length);
     writeFile(blobs)
-        .then(() => getPrinters(printer, files))
-        .catch(e => console.log(e))
+       .then(() => getPrinters(printer, files))
+       .catch(e => console.log(e))
 };
 
 

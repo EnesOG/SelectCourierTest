@@ -1,9 +1,9 @@
 let printer;
-const setPrinter  = (name) => {
+const setPrinter = (name) => {
     printer = name;
 };
 
-const startServer =  (port, res) => {
+const startServer = (port, res) => {
     const express = require('express');
     const app = express();
     const {ipcRenderer} = require('electron');
@@ -15,8 +15,8 @@ const startServer =  (port, res) => {
     const bodyParser = require('body-parser');
     const cors = require('cors');
     app.use(compression());
-    app.use(bodyParser.json({ limit: '1000mb' }));
-    app.use(bodyParser.urlencoded({ extended: true, limit: '1000mb' }));
+    app.use(bodyParser.json({limit: '1000mb'}));
+    app.use(bodyParser.urlencoded({extended: true, limit: '1000mb'}));
     app.use(cors());
     app.get('/ping', (req, res) => res.sendStatus(200));
     let defaultPort = 5000;
@@ -24,8 +24,12 @@ const startServer =  (port, res) => {
     if (port) defaultPort = port;
     app.post('/sendFile', (req, res) => {
         const {files} = req.body;
-        writeFileAsync(files,printer);
+        writeFileAsync(files, printer);
         res.json({status: 'Printing'});
+    });
+
+    app.post('/testFile', (req, res) => {
+        res.json(req.body.files)
     });
     server.listen(defaultPort, () => {
         console.log(`server is running on port:${defaultPort}`)
